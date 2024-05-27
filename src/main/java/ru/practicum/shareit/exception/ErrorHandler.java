@@ -19,35 +19,35 @@ public class ErrorHandler {
 
     @ExceptionHandler({BadRequestException.class, MissingRequestHeaderException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse BadRequestHandler(final BadRequestException e) {
+    public ErrorResponse badRequestHandler(final BadRequestException e) {
         log.error(e.getMessage());
         return new ErrorResponse("Неверный запрос", e.getMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse BadRequestHandler(final ValidationException e) {
+    public ErrorResponse validationHandler(final ValidationException e) {
         log.error(e.getMessage());
         return new ErrorResponse("Не пройдена валидация объекта", e.getMessage());
     }
 
     @ExceptionHandler(AlreadyExistException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse ConflictHandler(final AlreadyExistException e) {
+    public ErrorResponse conflictHandler(final AlreadyExistException e) {
         log.error(e.getMessage());
         return new ErrorResponse("Такой элемент уже существует", e.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse ForbiddenHandler(final AccessDeniedException e) {
+    public ErrorResponse forbiddenHandler(final AccessDeniedException e) {
         log.error(e.getMessage());
         return new ErrorResponse("У вас не допуска к этому действию", e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse NotFoundHandler(final NotFoundException e) {
+    public ErrorResponse notFoundHandler(final NotFoundException e) {
         log.error(e.getMessage());
         return new ErrorResponse("Данный элемент не найден: ", e.getMessage());
     }
