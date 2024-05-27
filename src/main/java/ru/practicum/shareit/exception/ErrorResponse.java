@@ -1,7 +1,9 @@
 package ru.practicum.shareit.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ErrorResponse {
-    private final static String WARNING = "ПРОИЗОШЛА ОШИБКА!!!";
     private final String massage;
     private final String error;
 

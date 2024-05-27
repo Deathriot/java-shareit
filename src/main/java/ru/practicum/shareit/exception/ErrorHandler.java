@@ -1,50 +1,67 @@
 package ru.practicum.shareit.exception;
 
-import org.springframework.context.annotation.Primary;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ValidationException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice("ru.practicum.shareit")
-@Primary
+@Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({BadRequestException.class, MissingRequestHeaderException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse BadRequestHandler(final BadRequestException e){
+    public ErrorResponse BadRequestHandler(final BadRequestException e) {
+        log.error(e.getMessage());
         return new ErrorResponse("Неверный запрос", e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse BadRequestHandler(final ValidationException e){
+    public ErrorResponse BadRequestHandler(final ValidationException e) {
+        log.error(e.getMessage());
         return new ErrorResponse("Не пройдена валидация объекта", e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(AlreadyExistException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse ConflictHandler(final AlreadyExistException e){
+    public ErrorResponse ConflictHandler(final AlreadyExistException e) {
+        log.error(e.getMessage());
         return new ErrorResponse("Такой элемент уже существует", e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse ForbiddenHandler(final AccessDeniedException e){
+    public ErrorResponse ForbiddenHandler(final AccessDeniedException e) {
+        log.error(e.getMessage());
         return new ErrorResponse("У вас не допуска к этому действию", e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse NotFoundHandler(final NotFoundException e){
+    public ErrorResponse NotFoundHandler(final NotFoundException e) {
+        log.error(e.getMessage());
         return new ErrorResponse("Данный элемент не найден: ", e.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse AllOtherStuffHandler(final Throwable e){
-        return new ErrorResponse("Что-то пошло не так...", e.getMessage());
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        log.error(e.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String name = ((FieldError) error).getField();
+            String msg = error.getDefaultMessage();
+            errors.put(name, msg);
+        });
+        return errors;
     }
 }

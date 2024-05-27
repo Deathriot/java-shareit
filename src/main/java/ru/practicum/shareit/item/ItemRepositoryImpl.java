@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
@@ -34,15 +33,15 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Item updateItem(Item item) {
         Item updatedItem = items.get(item.getId());
 
-        if(item.getName() != null){
+        if (item.getName() != null) {
             updatedItem.setName(item.getName());
         }
 
-        if(item.getDescription() != null){
+        if (item.getDescription() != null) {
             updatedItem.setDescription(item.getDescription());
         }
 
-        if(item.getAvailable() != null){
+        if (item.getAvailable() != null) {
             updatedItem.setAvailable(item.getAvailable());
         }
 
@@ -61,10 +60,14 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getItemsSearch(String text) {
+        String lowerText = text.toLowerCase();
+
         List<Item> allItems = new ArrayList<>(items.values());
 
         return allItems.stream()
-                .filter(item -> item.getName().contains(text) || item.getDescription().contains(text))
+                .filter(Item::getAvailable)
+                .filter(item -> item.getName().toLowerCase().contains(lowerText)
+                        || item.getDescription().toLowerCase().contains(lowerText))
                 .collect(Collectors.toList());
     }
 }

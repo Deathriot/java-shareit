@@ -49,26 +49,26 @@ public class UserServiceImpl implements UserService {
         return repository.getUsers();
     }
 
-    private void emailValidation(String email, long userId){
+    private void emailValidation(String email, long userId) {
         Map<Long, String> emails = repository.getEmails();
 
-        if(emails.containsValue(email) && !Objects.equals(email, emails.get(userId))){
+        if (emails.containsValue(email) && !Objects.equals(email, emails.get(userId))) {
             throw new AlreadyExistException("email");
         }
     }
 
-    private void emailValidation(String email){
+    private void emailValidation(String email) {
         Set<String> emails = new HashSet<>(repository.getEmails().values());
 
-        if(emails.contains(email)){
+        if (emails.contains(email)) {
             throw new AlreadyExistException("email");
         }
     }
 
-    private void idValidation(long id){
+    private void idValidation(long id) {
         User user = repository.getUserById(id);
 
-        if(user == null){
+        if (user == null) {
             throw new NotFoundException("User");
         }
     }

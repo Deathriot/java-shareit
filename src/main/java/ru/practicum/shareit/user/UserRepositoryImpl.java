@@ -31,17 +31,24 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User updateUser(User user) {
-        users.put(user.getId(), user);
+        User updatedUser = users.get(user.getId());
 
-        emails.put(user.getId(), user.getEmail());
+        if (user.getName() != null) {
+            updatedUser.setName(user.getName());
+        }
 
-        return user;
+        if (user.getEmail() != null) {
+            updatedUser.setEmail(user.getEmail());
+        }
+
+        emails.put(user.getId(), updatedUser.getEmail());
+
+        return updatedUser;
     }
 
     @Override
     public void deleteUserById(long userId) {
         users.remove(userId);
-
         emails.remove(userId);
     }
 

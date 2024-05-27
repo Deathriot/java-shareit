@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto addItem(ItemDto itemDto, long userId) {
         userIdValidation(userId);
 
-        Item item = ItemMapper.toItem(itemDto, userId);
+        Item item = ItemMapper.toItem(itemDto, 0, userId);
         return ItemMapper.toItemDto(repository.addItem(item));
     }
 
@@ -39,7 +38,7 @@ public class ItemServiceImpl implements ItemService {
             throw new AccessDeniedException("Редактирование Пользователем id = " + userId + ", предмета id = " + itemId);
         }
 
-        return ItemMapper.toItemDto(repository.updateItem(item));
+        return ItemMapper.toItemDto(repository.updateItem(ItemMapper.toItem(itemDto, itemId, userId)));
     }
 
     @Override
@@ -53,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getItems(long userId) {
         userIdValidation(userId);
 
-       return repository.getItems(userId).stream().map((ItemMapper::toItemDto)).collect(Collectors.toList());
+        return repository.getItems(userId).stream().map((ItemMapper::toItemDto)).collect(Collectors.toList());
     }
 
     @Override
@@ -71,10 +70,10 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private void isItemExist(long itemId){
+    private void isItemExist(long itemId) {
         Item item = repository.getItemById(itemId);
 
-        if(item == null){
+        if (item == null) {
             throw new NotFoundException("Item");
         }
     }
