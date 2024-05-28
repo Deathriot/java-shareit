@@ -60,7 +60,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getItemsSearch(String text) {
-        if(text.isEmpty()){
+        if (text.isEmpty()) {
             return new ArrayList<>();
         }
 
