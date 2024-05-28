@@ -15,15 +15,16 @@ import java.util.List;
 public final class ItemController {
 
     private final ItemService itemService;
+    private final static String USERIDHEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto postItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(value = "X-Sharer-User-Id") long userId) {
+    public ItemDto postItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(value = USERIDHEADER) long userId) {
         log.info("postItem");
         return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto patchItem(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemDto patchItem(@RequestBody ItemDto itemDto, @RequestHeader(USERIDHEADER) long userId,
                              @PathVariable long itemId) {
         log.info("patchItem");
         return itemService.updateItem(itemDto, userId, itemId);
@@ -42,7 +43,7 @@ public final class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemsSearch(@RequestParam(defaultValue = "null") String text) {
+    public List<ItemDto> getItemsSearch(@RequestParam(defaultValue = "") String text) {
         log.info("getItemsSearch");
         return itemService.getItemsSearch(text);
     }

@@ -4,7 +4,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UserRepository {
     User addUser(UserDto user);
@@ -17,6 +16,6 @@ public interface UserRepository {
 
     List<User> getUsers();
 
-    // Необходимо для валидации имейла на уровне сервиса
-    Map<Long, String> getEmails();
+    // Так норм?
+    boolean isEmailAlreadyExist(String email, long userId);
 }

@@ -60,11 +60,13 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getItemsSearch(String text) {
+        if(text.isEmpty()){
+            return new ArrayList<>();
+        }
+
         String lowerText = text.toLowerCase();
 
-        List<Item> allItems = new ArrayList<>(items.values());
-
-        return allItems.stream()
+        return items.values().stream()
                 .filter(Item::getAvailable)
                 .filter(item -> item.getName().toLowerCase().contains(lowerText)
                         || item.getDescription().toLowerCase().contains(lowerText))

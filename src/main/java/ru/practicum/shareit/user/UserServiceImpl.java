@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addUser(UserDto user) {
-        emailValidation(user.getEmail());
+        emailValidation(user.getEmail(), -1);
 
         return repository.addUser(user);
     }
@@ -50,17 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void emailValidation(String email, long userId) {
-        Map<Long, String> emails = repository.getEmails();
-
-        if (emails.containsValue(email) && !Objects.equals(email, emails.get(userId))) {
-            throw new AlreadyExistException("email");
-        }
-    }
-
-    private void emailValidation(String email) {
-        Set<String> emails = new HashSet<>(repository.getEmails().values());
-
-        if (emails.contains(email)) {
+        if (repository.isEmailAlreadyExist(email, userId)) {
             throw new AlreadyExistException("email");
         }
     }

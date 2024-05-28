@@ -63,7 +63,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Map<Long, String> getEmails() {
-        return new HashMap<>(emails);
+    public boolean isEmailAlreadyExist(String email, long userId) {
+
+        if (userId == -1) {
+            return emails.containsValue(email);
+        }
+
+        return emails.containsValue(email) & !Objects.equals(emails.get(userId), email);
     }
 }
