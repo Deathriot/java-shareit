@@ -69,6 +69,6 @@ public class UserRepositoryImpl implements UserRepository {
             return emails.containsValue(email);
         }
 
-        return emails.containsValue(email) & !Objects.equals(emails.get(userId), email);
+        return emails.containsValue(email) && !Objects.equals(emails.get(userId), email);
     }
 }
