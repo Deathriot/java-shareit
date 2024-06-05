@@ -16,8 +16,8 @@ import java.util.Map;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler({BadRequestException.class
-            , MissingRequestHeaderException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({BadRequestException.class,
+            MissingRequestHeaderException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse badRequestHandler(final Exception e) {
         final String message = "Неверный запрос ";
