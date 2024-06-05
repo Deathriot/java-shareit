@@ -104,10 +104,10 @@ public class ItemServiceImpl implements ItemService {
         Map<Long, List<CommentResponseDto>> commentsByItem = listCommentstoMap(comments);
 
         return ownersItems.stream()
-                .map(item -> ItemMapper.toItemResponseDto(item
-                        , closestBookings.get(item.getId()) == null ? null : closestBookings.get(item.getId()).get(0)
-                        , closestBookings.get(item.getId()) == null ? null : closestBookings.get(item.getId()).get(1)
-                        , commentsByItem.getOrDefault(item.getId(), null)))
+                .map(item -> ItemMapper.toItemResponseDto(item,
+                        closestBookings.get(item.getId()) == null ? null : closestBookings.get(item.getId()).get(0),
+                        closestBookings.get(item.getId()) == null ? null : closestBookings.get(item.getId()).get(1),
+                        commentsByItem.getOrDefault(item.getId(), null)))
                 .collect(Collectors.toList());
     }
 
