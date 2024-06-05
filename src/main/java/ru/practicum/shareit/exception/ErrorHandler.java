@@ -1,8 +1,8 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,58 +10,58 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ValidationException;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice("ru.practicum.shareit")
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler({BadRequestException.class, MissingRequestHeaderException.class})
+    @ExceptionHandler({BadRequestException.class
+            , MissingRequestHeaderException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse badRequestHandler(final BadRequestException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse("Неверный запрос", e.getMessage());
+    public ErrorResponse badRequestHandler(final Exception e) {
+        final String message = "Неверный запрос ";
+        log.error(message + e.getMessage());
+        return new ErrorResponse(message, e.getMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationHandler(final ValidationException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse("Не пройдена валидация объекта", e.getMessage());
+    public ErrorResponse validationHandler(final Exception e) {
+        final String message = "Не пройдена валидация объекта ";
+        log.error(message + e.getMessage());
+        return new ErrorResponse(message, e.getMessage());
     }
 
-    @ExceptionHandler(AlreadyExistException.class)
+    @ExceptionHandler({JdbcSQLIntegrityConstraintViolationException.class, AlreadyExistException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse conflictHandler(final AlreadyExistException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse("Такой элемент уже существует", e.getMessage());
+    public ErrorResponse conflictHandler(final Exception e) {
+        final String message = "Такой элемент уже существует ";
+        log.error(message + e.getMessage());
+        return new ErrorResponse(message, e.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse forbiddenHandler(final AccessDeniedException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse("У вас не допуска к этому действию", e.getMessage());
+    public ErrorResponse forbiddenHandler(final Exception e) {
+        final String message = "У вас не допуска к этому действию ";
+        log.error(message + e.getMessage());
+        return new ErrorResponse(message, e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFoundHandler(final NotFoundException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse("Данный элемент не найден: ", e.getMessage());
+    public ErrorResponse notFoundHandler(final Exception e) {
+        final String message = "Данный элемент не найден: ";
+        log.error(message + e.getMessage());
+        return new ErrorResponse(message, e.getMessage());
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+
+    // все ради того чтоб один тест был доволен...
+    @ExceptionHandler(UnSupportedStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach((error) -> {
-            String name = ((FieldError) error).getField();
-            String msg = error.getDefaultMessage();
-            errors.put(name, msg);
-        });
-        return errors;
+    public Map<String, String> unsupportedStateHandler(final Exception e) {
+        return Map.of("error", e.getMessage());
     }
 }

@@ -9,16 +9,26 @@ public final class UserMapper {
 
     public static UserDto toUserDto(User user) {
         return UserDto.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
     }
 
-    public static User toUser(UserDto userDto, long id) {
+    public static User toUser(UserDto userDto) {
         return User.builder()
-                .id(id)
+                .id(userDto.getId())
                 .email(userDto.getEmail())
                 .name(userDto.getName())
+                .build();
+    }
+
+    // Дополнительный метод маппера для упрощения обновления пользователя
+    public static User toUpdatedUser(User user, UserDto userDto) {
+        return User.builder()
+                .id(user.getId())
+                .name(userDto.getName() == null ? user.getName() : userDto.getName())
+                .email(userDto.getEmail() == null ? user.getEmail() : userDto.getEmail())
                 .build();
     }
 }
