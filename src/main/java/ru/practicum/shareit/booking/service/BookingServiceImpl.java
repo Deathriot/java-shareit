@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
             default:
                 // У нас тут тесты резко захотели проверять сообщение об ошибке, будем выкручиваться
-                throw new UnsupportedStateException("Unknown state: " + String.valueOf(state));
+                throw new UnsupportedStateException("Unknown state: " + state);
         }
     }
 
