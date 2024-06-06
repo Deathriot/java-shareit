@@ -59,7 +59,7 @@ public class ErrorHandler {
 
 
     // все ради того чтоб один тест был доволен...
-    @ExceptionHandler(UnSupportedStateException.class)
+    @ExceptionHandler(UnsupportedStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> unsupportedStateHandler(final Exception e) {
         return Map.of("error", e.getMessage());
