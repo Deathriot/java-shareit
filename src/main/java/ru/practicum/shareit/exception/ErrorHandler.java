@@ -48,6 +48,7 @@ public class ErrorHandler {
         return new ErrorResponse(message, e.getMessage());
     }
 
+
     // все ради того чтоб один тест был доволен...
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
