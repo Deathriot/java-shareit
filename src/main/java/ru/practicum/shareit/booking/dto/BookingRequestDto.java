@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Future;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 // ДТО для реквестов
 @Data
+@Builder
 public class BookingRequestDto {
     @FutureOrPresent
     @NotNull

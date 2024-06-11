@@ -34,13 +34,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUserById(long userId) {
+    public void deleteUserById(Long userId) {
         repository.deleteById(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserById(long userId) {
+    public UserDto getUserById(Long userId) {
         return UserMapper.toUserDto(repository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user")));
     }

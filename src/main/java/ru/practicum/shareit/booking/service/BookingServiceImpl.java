@@ -1,6 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -30,16 +33,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponseDto createBooking(BookingRequestDto bookingDto, long userId) {
+    public BookingResponseDto createBooking(BookingRequestDto bookingDto, Long userId) {
         bookingTimeValidation(bookingDto);
 
+        User user = getUser(userId);
         Item item = getItem(bookingDto.getItemId());
 
         if (!item.getAvailable()) {
             throw new BadRequestException("Нельзя забронировать недоступную вещь");
         }
-
-        User user = getUser(userId);
 
         if (item.getOwner().getId() == userId) {
             throw new NotFoundException("Зачем хозяину вещи делать запрос на ее бронирование?");
@@ -52,10 +54,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponseDto approveBooking(long bookingId, long userId, boolean approved) {
+    public BookingResponseDto approveBooking(Long bookingId, Long userId, Boolean approved) {
         Booking booking = repository.findById(bookingId).orElseThrow(() -> new NotFoundException("booking"));
-        Item item = booking.getItem();
         getUser(userId);
+        Item item = booking.getItem();
 
         if (item.getOwner().getId() != userId) {
             throw new NotFoundException("Редактирование брони не владельцем вещи, поэтому ее как бы нет");
@@ -72,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public BookingResponseDto getBooking(long bookingId, long userId) {
+    public BookingResponseDto getBooking(Long bookingId, Long userId) {
         Booking booking = repository.findById(bookingId).orElseThrow(() -> new NotFoundException("booking"));
         getUser(userId);
 
@@ -85,21 +87,25 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> getBookingByBooker(long userId, State state) {
+    public List<BookingResponseDto> getBookingByBooker(Long userId, State state, Integer from, Integer size) {
         // Проверяем существует ли пользователь
         getUser(userId);
 
-        List<Booking> bookings = repository.findAllByBookerIdOrderByStartDesc(userId);
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size, sort);
+        List<Booking> bookings = repository.findAllByBookerId(userId, pageable);
 
         return filterBookingsByState(bookings, state);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingResponseDto> getBookingItemsByOwner(long userId, State state) {
+    public List<BookingResponseDto> getBookingItemsByOwner(Long userId, State state, Integer from, Integer size) {
         getUser(userId);
 
-        List<Booking> bookings = repository.findAllByItemOwnerIdOrderByStartDesc(userId);
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size, sort);
+        List<Booking> bookings = repository.findAllByItemOwnerId(userId, pageable);
 
         return filterBookingsByState(bookings, state);
     }
@@ -152,7 +158,7 @@ public class BookingServiceImpl implements BookingService {
         final LocalDateTime start = booking.getStart();
         final LocalDateTime end = booking.getEnd();
 
-        if (start.isEqual(end)) {
+        if (start.isEqual(end) || start.equals(end)) {
             throw new BadRequestException("Время начала не может равным времени конца бронирования");
         }
 

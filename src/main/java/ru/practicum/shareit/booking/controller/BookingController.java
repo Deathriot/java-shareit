@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -9,12 +10,15 @@ import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class BookingController {
     private final BookingService service;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
@@ -44,15 +48,20 @@ public class BookingController {
 
     @GetMapping
     public List<BookingResponseDto> findUserBookings(@RequestHeader(USER_ID_HEADER) Long userId,
-                                                     @RequestParam(defaultValue = "ALL") State state) {
+                                                     @RequestParam(defaultValue = "ALL") State state,
+                                                     @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                     @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("findUserBookings");
-        return service.getBookingByBooker(userId, state);
+        return service.getBookingByBooker(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingResponseDto> findByItemOwnerBookings(@RequestHeader(USER_ID_HEADER) Long userId,
-                                                            @RequestParam(defaultValue = "ALL") State state) {
+                                                            @RequestParam(defaultValue = "ALL") State state,
+                                                            @RequestParam(defaultValue = "0")
+                                                            @PositiveOrZero Integer from,
+                                                            @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("findByItemOwnerBookings");
-        return service.getBookingItemsByOwner(userId, state);
+        return service.getBookingItemsByOwner(userId, state, from, size);
     }
 }

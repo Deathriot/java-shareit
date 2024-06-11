@@ -36,6 +36,7 @@ public final class ItemMapper {
                 .build();
     }
 
+    // Метод для создания вещи из поступившего объекта в теле запроса
     public static Item toItem(ItemRequestDto itemDto, long itemId, User user) {
         return Item.builder()
                 .id(itemId)
@@ -46,6 +47,7 @@ public final class ItemMapper {
                 .build();
     }
 
+    // Метод для обновления вещи
     public static Item toUpdatedItem(Item item, ItemRequestDto itemDto) {
         return Item.builder()
                 .id(item.getId())
@@ -53,6 +55,17 @@ public final class ItemMapper {
                 .name(itemDto.getName() == null ? item.getName() : itemDto.getName())
                 .description(itemDto.getDescription() == null ? item.getDescription() : itemDto.getDescription())
                 .available(itemDto.getAvailable() == null ? item.getAvailable() : itemDto.getAvailable())
+                .build();
+    }
+
+    // Метод для создания вещи, которая будет прикреплена к реквесту
+    public static ItemResponseDto toItemDtoWithRequest(Item item) {
+        return ItemResponseDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .requestId(item.getRequest() == null ? null : item.getRequest().getId())
                 .build();
     }
 }

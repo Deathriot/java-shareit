@@ -23,4 +23,6 @@ public class ItemResponseDto {
     private BookingShortResponseDto lastBooking;
 
     private List<CommentResponseDto> comments;
+
+    private Long requestId;
 }

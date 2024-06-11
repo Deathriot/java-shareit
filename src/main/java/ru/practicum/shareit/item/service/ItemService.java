@@ -8,15 +8,15 @@ import ru.practicum.shareit.item.dto.item.ItemResponseDto;
 import java.util.List;
 
 public interface ItemService {
-    ItemResponseDto addItem(ItemRequestDto itemDto, long userId);
+    ItemResponseDto addItem(ItemRequestDto itemDto, Long userId);
 
-    ItemResponseDto updateItem(ItemRequestDto itemDto, long userId, long itemId);
+    ItemResponseDto updateItem(ItemRequestDto itemDto, Long userId, Long itemId);
 
-    ItemResponseDto getItemById(long itemId, long userId);
+    ItemResponseDto getItemById(Long itemId, Long userId);
 
-    List<ItemResponseDto> getItems(long userId);
+    List<ItemResponseDto> getItems(Long userId, Integer from, Integer size);
 
-    List<ItemResponseDto> getItemsSearch(String text);
+    List<ItemResponseDto> getItemsSearch(String text, Integer from, Integer size);
 
-    CommentResponseDto createComment(CommentRequestDto commentDto, long userId, long itemId);
+    CommentResponseDto createComment(CommentRequestDto commentDto, Long userId, Long itemId);
 }
