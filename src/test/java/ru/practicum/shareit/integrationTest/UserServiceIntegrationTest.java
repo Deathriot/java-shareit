@@ -11,8 +11,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -92,5 +91,14 @@ public class UserServiceIntegrationTest {
                 () -> userService.updateUser(userDtoToUpdate, 999L));
 
         assertEquals("user", dataNotFoundException.getMessage());
+    }
+
+    @Test
+    void shouldDeleteById() {
+        userService.addUser(userDto);
+        userService.deleteUserById(1L);
+
+        List<UserDto> usersEmpty = userService.getUsers();
+        assertTrue(usersEmpty.isEmpty());
     }
 }

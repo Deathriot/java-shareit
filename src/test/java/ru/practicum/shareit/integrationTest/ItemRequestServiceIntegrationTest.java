@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.item.ItemRequestDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestResponseDto;
@@ -115,5 +116,51 @@ public class ItemRequestServiceIntegrationTest {
         assertEquals(1, returnedRequests.size());
         assertEquals(1L, returnedRequests.get(0).getId());
         assertEquals(itemRequestDto.getDescription(), returnedRequests.get(0).getDescription());
+    }
+
+    @Test
+    void getAllRequests_shouldGetRequestsWithItems() {
+        userService.addUser(userDto);
+        userService.addUser(user2Dto);
+
+        UserDto user3Dto = UserDto.builder()
+                .name("user3")
+                .email("user3@email.com")
+                .build();
+
+        userService.addUser(user3Dto);
+
+        ItemRequestDto item1 = ItemRequestDto.builder()
+                .requestId(1L)
+                .name("item1")
+                .available(true)
+                .description("item1")
+                .build();
+
+        ItemRequestDto item2 = ItemRequestDto.builder()
+                .requestId(2L)
+                .name("item2")
+                .available(true)
+                .description("item2")
+                .build();
+
+        RequestDto request1 = RequestDto.builder()
+                .description("request1")
+                .build();
+
+        RequestDto request2 = RequestDto.builder()
+                .description("request2")
+                .build();
+        itemRequestService.createRequest(request1, 1L);
+        itemRequestService.createRequest(request2, 2L);
+
+        itemService.addItem(item1, 1L);
+        itemService.addItem(item2, 2L);
+
+        List<RequestResponseDto> requests = itemRequestService.getAll(3L, 0, 10);
+
+        assertEquals(2, requests.size());
+        assertEquals(requests.get(0).getItems().get(0).getName(), item2.getName());
+        assertEquals(requests.get(1).getItems().get(0).getName(), item1.getName());
     }
 }

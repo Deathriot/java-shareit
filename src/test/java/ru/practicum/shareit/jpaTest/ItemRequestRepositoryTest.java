@@ -1,5 +1,6 @@
 package ru.practicum.shareit.jpaTest;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,13 @@ public class ItemRequestRepositoryTest {
                 .build();
     }
 
+    @AfterEach
+    void afterEach() {
+        itemRequestRepository.deleteAll();
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
     @Test
     void shouldReturnAllRequestForRequester() {
         Pageable pageable = PageRequest.of(0, 10);
@@ -79,5 +87,23 @@ public class ItemRequestRepositoryTest {
         assertEquals(1, requests.size());
         assertEquals(requests, List.of(itemRequest));
         assertEquals(itemRequest.getDescription(), requests.get(0).getDescription());
+    }
+
+    @Test
+    void shouldReturnAllByUserId() {
+        userRepository.save(owner);
+        userRepository.save(requester);
+        itemRepository.save(item);
+        itemRepository.save(item2);
+        itemRequestRepository.save(itemRequest);
+
+        List<ItemRequest> requests = itemRequestRepository.findAllByUserId(requester.getId());
+
+        assertEquals(1, requests.size());
+        assertEquals("description", requests.get(0).getDescription());
+
+        List<ItemRequest> requestsEmpty = itemRequestRepository.findAllByUserId(owner.getId());
+
+        assertEquals(0, requestsEmpty.size());
     }
 }

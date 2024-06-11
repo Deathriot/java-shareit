@@ -279,4 +279,34 @@ public class BookingServiceTest {
         assertEquals(booking1.getId(), returnedBookings.get(1).getId());
         assertEquals(booking2.getId(), returnedBookings.get(2).getId());
     }
+
+    @Test
+    void createBookingShouldReturnBadRequestExceptionWhenStartEqualsEnd() {
+        LocalDateTime start = LocalDateTime.now();
+
+        BookingRequestDto wrongBooking = BookingRequestDto.builder()
+                .start(start)
+                .end(start)
+                .itemId(1L)
+                .build();
+
+        BadRequestException ex =
+                assertThrows(BadRequestException.class, () -> bookingService.createBooking(wrongBooking, 2L));
+        assertEquals("Время начала не может равным времени конца бронирования", ex.getMessage());
+    }
+
+    @Test
+    void createBookingShouldReturnBadRequestExceptionWhenStartAfterEnd() {
+        LocalDateTime start = LocalDateTime.now();
+
+        BookingRequestDto wrongBooking = BookingRequestDto.builder()
+                .start(start.plusHours(1))
+                .end(start)
+                .itemId(1L)
+                .build();
+
+        BadRequestException ex =
+                assertThrows(BadRequestException.class, () -> bookingService.createBooking(wrongBooking, 2L));
+        assertEquals("Время конца не может быть до времени начала бронирования", ex.getMessage());
+    }
 }

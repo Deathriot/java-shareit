@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.comment.CommentRequestDto;
 import ru.practicum.shareit.item.dto.comment.CommentResponseDto;
@@ -247,5 +248,17 @@ public class ItemControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(itemService, Mockito.never()).createComment(commentDto, 1L, 1L);
+    }
+
+    @Test
+    @SneakyThrows
+    void addItem_Status404_WhenUserNotFound() {
+        Mockito.when(itemService.addItem(itemDto, 100L)).thenThrow(new NotFoundException("user"));
+
+        mockMvc.perform(post("/items")
+                        .header(USER_ID, 100L)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(itemDto)))
+                .andExpect(status().isNotFound());
     }
 }

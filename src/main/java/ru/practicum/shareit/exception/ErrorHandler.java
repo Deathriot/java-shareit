@@ -33,7 +33,7 @@ public class ErrorHandler {
         return new ErrorResponse(message, e.getMessage());
     }
 
-    @ExceptionHandler({JdbcSQLIntegrityConstraintViolationException.class, AlreadyExistException.class})
+    @ExceptionHandler({JdbcSQLIntegrityConstraintViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse conflictHandler(final Exception e) {
         final String message = "Такой элемент уже существует ";
