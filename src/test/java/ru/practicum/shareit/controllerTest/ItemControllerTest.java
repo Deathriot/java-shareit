@@ -265,8 +265,8 @@ public class ItemControllerTest {
 
     @Test
     @SneakyThrows
-    void updateItem_Status403_WhenUserIsNotItemCreator(){
-        Mockito.when(itemService.updateItem(itemDto, 1L,1L))
+    void updateItem_Status403_WhenUserIsNotItemCreator() {
+        Mockito.when(itemService.updateItem(itemDto, 1L, 1L))
                 .thenThrow(new AccessDeniedException("У вас нет допуска к этому действию"));
 
         mockMvc.perform(patch("/items/{id}", 1L)
