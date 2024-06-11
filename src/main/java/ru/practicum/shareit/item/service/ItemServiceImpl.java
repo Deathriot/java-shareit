@@ -67,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
         userIdValidation(userId);
         Item item = repository.findById(itemId).orElseThrow(() -> new NotFoundException("Item id = " + itemId));
 
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new AccessDeniedException("Редактирование Пользователем id = " + userId + ", вещи id = " + itemId);
         }
 
@@ -84,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
 
         // Если вещь просматривает не ее владелец - скрываем ближайшие брони
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             return ItemMapper.toItemResponseDto(item, null, null, comments);
         }
 

@@ -43,7 +43,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Нельзя забронировать недоступную вещь");
         }
 
-        if (item.getOwner().getId() == userId) {
+        if (item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Зачем хозяину вещи делать запрос на ее бронирование?");
         }
 
@@ -59,7 +59,7 @@ public class BookingServiceImpl implements BookingService {
         getUser(userId);
         Item item = booking.getItem();
 
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Редактирование брони не владельцем вещи, поэтому ее как бы нет");
         }
 
@@ -78,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = repository.findById(bookingId).orElseThrow(() -> new NotFoundException("booking"));
         getUser(userId);
 
-        if (booking.getBooker().getId() != userId && booking.getItem().getOwner().getId() != userId) {
+        if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
             throw new NotFoundException("просмотр брони не ее владельцем или владельцем вещи, для остальных ее нет");
         }
 
