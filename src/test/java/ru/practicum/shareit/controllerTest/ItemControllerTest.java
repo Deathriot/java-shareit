@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.comment.CommentRequestDto;
@@ -260,5 +261,18 @@ public class ItemControllerTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateItem_Status403_WhenUserIsNotItemCreator(){
+        Mockito.when(itemService.updateItem(itemDto, 1L,1L))
+                .thenThrow(new AccessDeniedException("У вас нет допуска к этому действию"));
+
+        mockMvc.perform(patch("/items/{id}", 1L)
+                        .header(USER_ID, 1L)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(itemDto)))
+                .andExpect(status().isForbidden());
     }
 }

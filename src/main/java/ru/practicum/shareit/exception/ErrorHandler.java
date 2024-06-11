@@ -25,14 +25,6 @@ public class ErrorHandler {
         return new ErrorResponse(message, e.getMessage());
     }
 
-    @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationHandler(final Exception e) {
-        final String message = "Не пройдена валидация объекта ";
-        log.error(message + e.getMessage());
-        return new ErrorResponse(message, e.getMessage());
-    }
-
     @ExceptionHandler({JdbcSQLIntegrityConstraintViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse conflictHandler(final Exception e) {
@@ -56,7 +48,6 @@ public class ErrorHandler {
         log.error(message + e.getMessage());
         return new ErrorResponse(message, e.getMessage());
     }
-
 
     // все ради того чтоб один тест был доволен...
     @ExceptionHandler(IllegalArgumentException.class)
