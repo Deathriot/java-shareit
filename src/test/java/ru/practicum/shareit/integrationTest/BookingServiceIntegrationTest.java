@@ -123,8 +123,8 @@ public class BookingServiceIntegrationTest {
         NotFoundException dataNotFoundException = assertThrows(NotFoundException.class,
                 () -> bookingService.createBooking(bookingDtoInput, 1L));
 
-        assertEquals("Зачем хозяину вещи делать запрос на ее бронирование?"
-                , dataNotFoundException.getMessage());
+        assertEquals("Зачем хозяину вещи делать запрос на ее бронирование?",
+                dataNotFoundException.getMessage());
     }
 
     @Test
