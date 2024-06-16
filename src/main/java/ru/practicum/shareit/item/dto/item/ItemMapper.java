@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.dto.item;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.item.dto.comment.CommentResponseDto;
 import ru.practicum.shareit.item.model.Item;
@@ -7,13 +8,11 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
+@UtilityClass
 public final class ItemMapper {
-    private ItemMapper() {
-
-    }
 
     // метод для возврата при создании или обновлении вещи
-    public static ItemResponseDto toItemDto(Item item) {
+    public ItemResponseDto toItemDto(Item item) {
         return ItemResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -23,8 +22,8 @@ public final class ItemMapper {
     }
 
     // Метод для возврата для получения вещи с комментариями и букингами
-    public static ItemResponseDto toItemResponseDto(Item item, BookingShortResponseDto last,
-                                                    BookingShortResponseDto next, List<CommentResponseDto> comments) {
+    public ItemResponseDto toItemResponseDto(Item item, BookingShortResponseDto last,
+                                             BookingShortResponseDto next, List<CommentResponseDto> comments) {
         return ItemResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -37,7 +36,7 @@ public final class ItemMapper {
     }
 
     // Метод для создания вещи из поступившего объекта в теле запроса
-    public static Item toItem(ItemRequestDto itemDto, long itemId, User user) {
+    public Item toItem(ItemRequestDto itemDto, long itemId, User user) {
         return Item.builder()
                 .id(itemId)
                 .owner(user)
@@ -48,7 +47,7 @@ public final class ItemMapper {
     }
 
     // Метод для обновления вещи
-    public static Item toUpdatedItem(Item item, ItemRequestDto itemDto) {
+    public Item toUpdatedItem(Item item, ItemRequestDto itemDto) {
         return Item.builder()
                 .id(item.getId())
                 .owner(item.getOwner())
@@ -59,7 +58,7 @@ public final class ItemMapper {
     }
 
     // Метод для создания вещи, которая будет прикреплена к реквесту
-    public static ItemResponseDto toItemDtoWithRequest(Item item) {
+    public ItemResponseDto toItemDtoWithRequest(Item item) {
         return ItemResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())

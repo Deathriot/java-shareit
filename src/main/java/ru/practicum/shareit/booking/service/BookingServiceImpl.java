@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PageBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
     public BookingResponseDto createBooking(BookingRequestDto bookingDto, Long userId) {
         bookingTimeValidation(bookingDto);
 
@@ -53,7 +53,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional
     public BookingResponseDto approveBooking(Long bookingId, Long userId, Boolean approved) {
         Booking booking = repository.findById(bookingId).orElseThrow(() -> new NotFoundException("booking"));
         getUser(userId);
@@ -92,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
         getUser(userId);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
-        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size, sort);
+        Pageable pageable = PageBuilder.getPageable(from, size, sort);
         List<Booking> bookings = repository.findAllByBookerId(userId, pageable);
 
         return filterBookingsByState(bookings, state);
@@ -104,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
         getUser(userId);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
-        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size, sort);
+        Pageable pageable = PageBuilder.getPageable(from, size, sort);
         List<Booking> bookings = repository.findAllByItemOwnerId(userId, pageable);
 
         return filterBookingsByState(bookings, state);

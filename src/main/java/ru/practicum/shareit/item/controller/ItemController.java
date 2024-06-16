@@ -47,7 +47,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponseDto> getItems(@RequestHeader("X-Sharer-User-Id") long userId,
+    public List<ItemResponseDto> getItems(@RequestHeader(SHARER_USER_ID) long userId,
                                           @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                           @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("getItems");

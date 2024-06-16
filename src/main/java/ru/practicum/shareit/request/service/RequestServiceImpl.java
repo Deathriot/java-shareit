@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PageBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,13 +27,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RequestServiceImpl implements RequestService {
     private final RequestRepository repository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
     @Override
-    @Transactional
     public RequestResponseDto createRequest(RequestDto requestDto, Long userId) {
         User user = getUser(userId);
         ItemRequest itemRequest = RequestMapper.toItemRequest(requestDto, user);
@@ -76,7 +76,7 @@ public class RequestServiceImpl implements RequestService {
         getUser(userId);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
-        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size, sort);
+        Pageable pageable = PageBuilder.getPageable(from, size, sort);
 
         List<ItemRequest> requests = repository.findAllByUserIdNot(userId, pageable);
         List<Item> items = itemRepository.findAllByRequestIn(requests);

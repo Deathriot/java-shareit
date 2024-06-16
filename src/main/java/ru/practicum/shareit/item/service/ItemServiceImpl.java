@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +26,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PageBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final UserRepository userRepository;
@@ -45,7 +46,6 @@ public class ItemServiceImpl implements ItemService {
     private final RequestRepository requestRepository;
 
     @Override
-    @Transactional
     public ItemResponseDto addItem(ItemRequestDto itemDto, Long userId) {
         User user = userIdValidation(userId);
 
@@ -62,7 +62,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public ItemResponseDto updateItem(ItemRequestDto itemDto, Long userId, Long itemId) {
         userIdValidation(userId);
         Item item = repository.findById(itemId).orElseThrow(() -> new NotFoundException("Item id = " + itemId));
@@ -103,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponseDto> getItems(Long userId, Integer from, Integer size) {
         userIdValidation(userId);
 
-        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size);
+        Pageable pageable = PageBuilder.getPageable(from, size);
         // Получаем список вещей пользователя
         List<Item> ownersItems = repository.findAllByOwnerId(userId, pageable);
         // Получаем все бронирования для всех этих вещей
@@ -131,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
 
-        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size);
+        Pageable pageable = PageBuilder.getPageable(from, size);
         return repository.getItemsSearch(text, pageable).stream()
                 .map(ItemMapper::toItemDto).collect(Collectors.toList());
     }

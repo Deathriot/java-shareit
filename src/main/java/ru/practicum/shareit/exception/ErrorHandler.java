@@ -48,6 +48,14 @@ public class ErrorHandler {
         return new ErrorResponse(message, e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse anyOtherTroubleHandler(final Throwable e) {
+        final String message = "Произошла непредвиденная ошибка! ";
+        log.error(message + e.getMessage());
+        e.printStackTrace();
+        return new ErrorResponse(message, e.getMessage());
+    }
 
     // все ради того чтоб один тест был доволен...
     @ExceptionHandler(IllegalArgumentException.class)
