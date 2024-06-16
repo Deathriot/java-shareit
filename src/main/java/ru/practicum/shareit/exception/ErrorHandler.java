@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ValidationException;
 import java.util.Map;
 
 @RestControllerAdvice("ru.practicum.shareit")
@@ -21,14 +20,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse badRequestHandler(final Exception e) {
         final String message = "Неверный запрос ";
-        log.error(message + e.getMessage());
-        return new ErrorResponse(message, e.getMessage());
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationHandler(final Exception e) {
-        final String message = "Не пройдена валидация объекта ";
         log.error(message + e.getMessage());
         return new ErrorResponse(message, e.getMessage());
     }
@@ -57,6 +48,14 @@ public class ErrorHandler {
         return new ErrorResponse(message, e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse anyOtherTroubleHandler(final Throwable e) {
+        final String message = "Произошла непредвиденная ошибка! ";
+        log.error(message + e.getMessage());
+        e.printStackTrace();
+        return new ErrorResponse(message, e.getMessage());
+    }
 
     // все ради того чтоб один тест был доволен...
     @ExceptionHandler(IllegalArgumentException.class)

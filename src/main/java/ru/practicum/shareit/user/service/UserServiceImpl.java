@@ -14,17 +14,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
-    @Transactional
     public UserDto addUser(UserDto user) {
         return UserMapper.toUserDto(repository.save(UserMapper.toUser(user)));
     }
 
     @Override
-    @Transactional
     public UserDto updateUser(UserDto userDto, Long userId) {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user"));
@@ -33,14 +32,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public void deleteUserById(long userId) {
+    public void deleteUserById(Long userId) {
         repository.deleteById(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserById(long userId) {
+    public UserDto getUserById(Long userId) {
         return UserMapper.toUserDto(repository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user")));
     }

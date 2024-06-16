@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -21,8 +22,11 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.util.PageBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,29 +37,36 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Override
-    @Transactional
-    public ItemResponseDto addItem(ItemRequestDto itemDto, long userId) {
+    public ItemResponseDto addItem(ItemRequestDto itemDto, Long userId) {
         User user = userIdValidation(userId);
 
         Item item = ItemMapper.toItem(itemDto, 0, user);
 
-        return ItemMapper.toItemDto(repository.save(item));
+        if (itemDto.getRequestId() != null) {
+            ItemRequest request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("request"));
+
+            item.setRequest(request);
+        }
+
+        return ItemMapper.toItemDtoWithRequest(repository.save(item));
     }
 
     @Override
-    @Transactional
-    public ItemResponseDto updateItem(ItemRequestDto itemDto, long userId, long itemId) {
+    public ItemResponseDto updateItem(ItemRequestDto itemDto, Long userId, Long itemId) {
         userIdValidation(userId);
         Item item = repository.findById(itemId).orElseThrow(() -> new NotFoundException("Item id = " + itemId));
 
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new AccessDeniedException("Редактирование Пользователем id = " + userId + ", вещи id = " + itemId);
         }
 
@@ -64,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemResponseDto getItemById(long itemId, long userId) {
+    public ItemResponseDto getItemById(Long itemId, Long userId) {
         Item item = repository.findById(itemId).orElseThrow(() -> new NotFoundException("Item id = " + itemId));
         userIdValidation(userId);
 
@@ -72,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
 
         // Если вещь просматривает не ее владелец - скрываем ближайшие брони
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             return ItemMapper.toItemResponseDto(item, null, null, comments);
         }
 
@@ -88,11 +99,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemResponseDto> getItems(long userId) {
+    public List<ItemResponseDto> getItems(Long userId, Integer from, Integer size) {
         userIdValidation(userId);
 
+        Pageable pageable = PageBuilder.getPageable(from, size);
         // Получаем список вещей пользователя
-        List<Item> ownersItems = repository.findAllByOwnerId(userId);
+        List<Item> ownersItems = repository.findAllByOwnerId(userId, pageable);
         // Получаем все бронирования для всех этих вещей
         List<Booking> bookingsByItems = bookingRepository.findAllByItemIn(ownersItems);
         // Получаем мапу, где ключ - это айди вещи, а значение - пара из самых ближайших ее бронирований
@@ -113,17 +125,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemResponseDto> getItemsSearch(String text) {
+    public List<ItemResponseDto> getItemsSearch(String text, Integer from, Integer size) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return repository.getItemsSearch(text).stream()
+        Pageable pageable = PageBuilder.getPageable(from, size);
+        return repository.getItemsSearch(text, pageable).stream()
                 .map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
-    public CommentResponseDto createComment(CommentRequestDto commentDto, long userId, long itemId) {
+    public CommentResponseDto createComment(CommentRequestDto commentDto, Long userId, Long itemId) {
         User user = userIdValidation(userId);
         Item item = repository.findById(itemId).orElseThrow(() -> new NotFoundException("Item id = " + itemId));
 

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -14,9 +15,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItemIn(List<Item> items);
 
-    List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findAllByBookerId(Long bookerId, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdOrderByStartDesc(Long itemOwnerId);
+    List<Booking> findAllByItemOwnerId(Long itemOwnerId, Pageable pageable);
 
     // Получаем список букингов, которые были у пользователя, с условием, что он пользовался этой вещью
     List<Booking> findAllByBookerIdAndItemIdAndStatusAndEndBefore(Long bookerId, Long itemId,
