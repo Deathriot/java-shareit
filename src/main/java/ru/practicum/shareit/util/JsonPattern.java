@@ -4,5 +4,5 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class JsonPattern {
-    public static final String DATE_PATTERN = "YYYY-MM-DD-HH:mm:ss";
+    public static final String DATE_PATTERN = "YYYY-MM-dd'T'HH:mm:ss";
 }
